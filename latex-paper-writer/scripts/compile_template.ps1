@@ -28,7 +28,13 @@ try {
         exit 1
     }
 
-    $base = [System.IO.Path]::ChangeExtension($MainTex, $null)
+    $mainDir = [System.IO.Path]::GetDirectoryName($MainTex)
+    $mainStem = [System.IO.Path]::GetFileNameWithoutExtension($MainTex)
+    if ($mainDir) {
+        $base = Join-Path $mainDir $mainStem
+    } else {
+        $base = $mainStem
+    }
     $log = "$base.log"
     Write-Host "== compiling $MainTex in $TemplateWorkdir =="
 

@@ -65,7 +65,8 @@ if (Test-Path -LiteralPath $Root -PathType Container) {
 
     Write-Host ""
     Write-Host "Class/style files:"
-    Get-ChildItem -LiteralPath $Root -Recurse -Depth 3 -Include *.cls,*.sty,*.bst -File -ErrorAction SilentlyContinue |
+    Get-ChildItem -LiteralPath $Root -Recurse -Depth 3 -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Extension -in ".cls", ".sty", ".bst" } |
         ForEach-Object { Write-Host ("  {0}" -f $_.FullName) }
 } else {
     Write-Host "[warn] root is not a directory: $Root"
