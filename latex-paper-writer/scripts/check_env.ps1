@@ -42,9 +42,31 @@ if (Get-Command codex -ErrorAction SilentlyContinue) {
         Write-Host "[ok] zotero MCP is configured"
     } else {
         Write-Host "[warn] zotero MCP was not found in codex mcp list"
+        Write-Host "       Citation lookup will be limited until Zotero MCP is registered."
+        Write-Host "       Typical local-only setup:"
+        Write-Host "       codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp"
     }
 } else {
     Write-Host "[warn] codex CLI not found on PATH"
+    Write-Host "       Cannot check or register Zotero MCP from this shell."
+}
+Write-Host ""
+
+if (Get-Command zotero -ErrorAction SilentlyContinue) {
+    Write-Host "[ok] zotero command found"
+} else {
+    $zoteroCandidates = @(
+        "$env:LOCALAPPDATA\Programs\Zotero\zotero.exe",
+        "$env:ProgramFiles\Zotero\zotero.exe",
+        "${env:ProgramFiles(x86)}\Zotero\zotero.exe"
+    ) | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Leaf) }
+
+    if ($zoteroCandidates.Count -gt 0) {
+        Write-Host ("[ok] zotero desktop found at {0}" -f $zoteroCandidates[0])
+    } else {
+        Write-Host "[warn] Zotero desktop was not found in common Windows locations"
+        Write-Host "       Install Zotero and enable its local API for Zotero-first citation workflows."
+    }
 }
 Write-Host ""
 

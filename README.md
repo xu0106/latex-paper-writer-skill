@@ -83,6 +83,10 @@ and compile checks work best with:
 - optional: `latexmk`, `pdflatex`, `xelatex`, `bibtex`
 - optional: Codex Zotero MCP server for citation lookup
 
+For citation-heavy workflows, Zotero is effectively required. If Zotero or
+Zotero MCP is missing, the skill should warn the user and ask for Zotero setup,
+BibTeX, DOI, PDF, or exact title/author metadata instead of inventing citations.
+
 ## Windows Support
 
 The skill supports both Unix-like shells and native Windows PowerShell.
@@ -98,7 +102,19 @@ Native Windows users should install:
 
 - Pandoc
 - Tectonic, MiKTeX, or TeX Live
-- optional: Zotero and Zotero MCP for citation lookup
+- Zotero and Zotero MCP for citation lookup when references are needed
+
+Typical Zotero MCP registration from normal PowerShell:
+
+```powershell
+codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp
+```
+
+Also open Zotero and enable:
+
+```text
+Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero
+```
 
 If PowerShell blocks script execution, run the script for the current session with:
 
@@ -253,6 +269,10 @@ cp -a /tmp/latex-paper-writer-skill/latex-paper-writer ~/.codex/skills/
 - 可选：`latexmk`、`pdflatex`、`xelatex`、`bibtex`
 - 可选：Codex Zotero MCP，用于查询参考文献
 
+如果任务需要大量引用、补全文献或查询论文，Zotero 实际上应该视为必需项。
+如果 Zotero 或 Zotero MCP 缺失，skill 应提醒用户安装/配置 Zotero，或者提供
+BibTeX、DOI、PDF、准确标题和作者信息，而不是编造引用。
+
 ## Windows 支持
 
 这个 skill 现在同时支持类 Unix shell 和 Windows 原生 PowerShell。
@@ -267,7 +287,19 @@ Windows 原生环境建议安装：
 
 - Pandoc
 - Tectonic、MiKTeX 或 TeX Live
-- 可选：Zotero 和 Zotero MCP，用于文献查询
+- 当需要参考文献查询时：Zotero 和 Zotero MCP
+
+在普通 PowerShell 中注册 Zotero MCP 的典型命令：
+
+```powershell
+codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp
+```
+
+同时需要打开 Zotero 并启用：
+
+```text
+Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero
+```
 
 如果 PowerShell 阻止脚本执行，可以用当前会话绕过策略运行：
 

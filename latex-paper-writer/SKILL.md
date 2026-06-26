@@ -32,6 +32,7 @@ Then inspect:
    - On Linux, macOS, Git Bash, or WSL2, run `scripts/check_env.sh <project-or-template-root>`.
    - On native Windows PowerShell, run `scripts/check_env.ps1 -Root <project-or-template-root>`.
    - If `pandoc` or TeX tooling is missing, use the matching `install_user_tools` script only after permission for network/user-environment writes is available.
+   - If the task needs citations or literature search and Zotero MCP is missing, stop before drafting and tell the user to install Zotero plus register the Zotero MCP. Do not silently fall back to invented or placeholder citations.
 
 2. **Template work copy**
    - Do not mutate the original template. Copy or unpack it into a work directory such as `paper_build_workdir/`.
@@ -58,6 +59,7 @@ Ask instead of guessing when:
 
 - The LaTeX template is not complete or the class/style files are missing.
 - The venue requires a specific template but no template was uploaded.
+- Zotero, Zotero local API, or Zotero MCP is missing for a citation/literature task.
 - Zotero cannot find a requested paper or citation key.
 - A paper PDF, DOI, BibTeX entry, or Zotero collection is needed.
 - Network, sudo, non-sandbox, or user-environment writes are required.
