@@ -3,16 +3,30 @@ set -euo pipefail
 
 echo "== latex-paper-writer user tool install =="
 
-if command -v pandoc >/dev/null 2>&1 && command -v tectonic >/dev/null 2>&1; then
-  echo "[ok] pandoc and tectonic are already installed"
+has_tex_route=0
+if command -v tectonic >/dev/null 2>&1 || command -v pdflatex >/dev/null 2>&1 || command -v xelatex >/dev/null 2>&1; then
+  has_tex_route=1
+fi
+
+if command -v pandoc >/dev/null 2>&1 && [ "$has_tex_route" -eq 1 ]; then
+  echo "[ok] pandoc and a LaTeX compile route are already installed"
   pandoc --version | head -n 1
-  tectonic --version
+  if command -v tectonic >/dev/null 2>&1; then
+    tectonic --version
+  fi
   exit 0
 fi
 
 if command -v conda >/dev/null 2>&1; then
-  echo "Installing pandoc and tectonic with conda-forge..."
-  conda install -y -c conda-forge pandoc tectonic
+  packages=()
+  if ! command -v pandoc >/dev/null 2>&1; then
+    packages+=(pandoc)
+  fi
+  if [ "$has_tex_route" -eq 0 ]; then
+    packages+=(tectonic)
+  fi
+  echo "Installing ${packages[*]} with conda-forge..."
+  conda install -y -c conda-forge "${packages[@]}"
   exit 0
 fi
 

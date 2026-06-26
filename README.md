@@ -73,81 +73,165 @@ For best results, provide:
 If the template is incomplete, the skill should ask for the missing files rather
 than guessing the venue format.
 
-## Dependencies
+## Dependency Setup Before Using The Skill
 
-The skill can inspect templates without a full LaTeX installation, but conversion
-and compile checks work best with:
+The recommended first-run workflow is intentionally two-phase:
+
+1. The user installs the OS-level tools below.
+2. The user tells Codex that installation is finished.
+3. Codex runs the bundled environment checker.
+4. If anything is still missing, Codex reports the exact missing tools and may
+   attempt installation only after explicit permission for network access,
+   user-environment writes, `sudo`, or elevated installers.
+
+Do not expect Codex to silently install the whole workflow on a fresh machine.
+GUI applications such as Zotero and TeX distributions often need normal user
+setup, PATH refreshes, or first-run configuration.
+
+Required for Markdown-to-LaTeX conversion:
 
 - `pandoc`
-- `tectonic`
-- optional: `latexmk`, `pdflatex`, `xelatex`, `bibtex`
-- optional: Codex Zotero MCP server for citation lookup
 
-For citation-heavy workflows, Zotero is effectively required. If Zotero or
-Zotero MCP is missing, the skill should warn the user and ask for Zotero setup,
+Required for PDF compilation, choose at least one route:
+
+- `tectonic`
+- or a TeX distribution such as MiKTeX or TeX Live with `pdflatex`, `xelatex`,
+  `bibtex`, and preferably `latexmk`
+
+Required for Zotero-first citation workflows:
+
+- Zotero desktop
+- Zotero local API enabled
+- `uv`/`uvx`
+- Codex Zotero MCP server registered
+
+If a task needs citations, literature lookup, or bibliography completion and
+Zotero/Zotero MCP is missing, the skill should stop and ask for Zotero setup,
 BibTeX, DOI, PDF, or exact title/author metadata instead of inventing citations.
 
-## Windows Support
+### Windows PowerShell
 
-The skill supports both Unix-like shells and native Windows PowerShell.
-
-Recommended Windows options:
-
-- **WSL2**: most compatible path; use the Bash scripts (`*.sh`).
-- **Native PowerShell**: use the PowerShell scripts (`*.ps1`).
-- **Git Bash**: may work with the Bash scripts, but TeX and PATH behavior depends
-  on the local installation.
-
-Native Windows users should install:
-
-- Pandoc
-- Tectonic, MiKTeX, or TeX Live
-- Zotero and Zotero MCP for citation lookup when references are needed
-
-Typical Zotero MCP registration from normal PowerShell:
+Native Windows users should run these from a normal PowerShell window, not from
+a restricted sandbox shell:
 
 ```powershell
-codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp
+winget install --id JohnMacFarlane.Pandoc -e
+winget install --id MiKTeX.MiKTeX -e
 ```
 
-Also open Zotero and enable:
+If you prefer Tectonic and already use conda:
+
+```powershell
+conda install -y -c conda-forge tectonic
+```
+
+Install Zotero from the official download page:
+
+```text
+https://www.zotero.org/download/
+```
+
+Or search for the current Windows package ID:
+
+```powershell
+winget search Zotero
+```
+
+Install `uv` so `uvx` can run `zotero-mcp`:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Then restart PowerShell, VS Code, and Codex so PATH changes are visible. Open
+Zotero once and enable:
 
 ```text
 Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero
 ```
 
-If PowerShell blocks script execution, run the script for the current session with:
+Register Zotero MCP from normal PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template
+codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp
 ```
 
-The bundled environment checker reports what is available:
-
-```bash
-~/.codex/skills/latex-paper-writer/scripts/check_env.sh /path/to/template-or-project
-```
-
-On native Windows PowerShell:
+After installation, ask Codex to check the environment, or run:
 
 ```powershell
 ~\.codex\skills\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template-or-project
 ```
 
-If `pandoc` or `tectonic` is missing and `conda` is available, the helper script
-can install user-level tools:
+If PowerShell blocks script execution for the current session:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ~\.codex\skills\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template-or-project
+```
+
+MiKTeX may require a first-run setup or package update before `pdflatex` and
+`bibtex` work. Open MiKTeX Console once, check for updates, and allow on-the-fly
+package installation when compiling templates.
+
+### Ubuntu / WSL2
+
+Install the common command-line dependencies:
+
+```bash
+sudo apt update
+sudo apt install -y pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended latexmk git unzip curl
+```
+
+If you prefer Tectonic and use conda:
+
+```bash
+conda install -y -c conda-forge tectonic
+```
+
+Install Zotero from the official download page:
+
+```text
+https://www.zotero.org/download/
+```
+
+Install `uv` so `uvx` can run `zotero-mcp`:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Restart the shell after installing `uv`, then open Zotero and enable:
+
+```text
+Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero
+```
+
+Register Zotero MCP:
+
+```bash
+codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp
+```
+
+After installation, ask Codex to check the environment, or run:
+
+```bash
+~/.codex/skills/latex-paper-writer/scripts/check_env.sh /path/to/template-or-project
+```
+
+If `pandoc` or `tectonic` is still missing and `conda` is available, Codex may
+run the helper script after permission:
 
 ```bash
 ~/.codex/skills/latex-paper-writer/scripts/install_user_tools.sh
 ```
 
-On native Windows PowerShell:
+On native Windows PowerShell, the equivalent helper is:
 
 ```powershell
 ~\.codex\skills\latex-paper-writer\scripts\install_user_tools.ps1
 ```
 
-These scripts do not silently run `sudo` or elevated installers.
+These scripts do not silently run `sudo`, download GUI installers, or modify
+PATH without user approval.
 
 ## Repository Structure
 
@@ -158,6 +242,7 @@ latex-paper-writer/
 │   └── openai.yaml
 ├── references/
 │   ├── citation-policy.md
+│   ├── dependency-setup.md
 │   ├── template-analysis.md
 │   └── writing-workflow.md
 └── scripts/
@@ -184,8 +269,7 @@ The skill instructs Codex to:
 
 ## License
 
-No license has been added yet. Add a `LICENSE` file before publishing this as an
-open-source project if you want others to reuse it under explicit terms.
+This project is released under the MIT License. See `LICENSE`.
 
 ---
 
@@ -260,78 +344,157 @@ cp -a /tmp/latex-paper-writer-skill/latex-paper-writer ~/.codex/skills/
 
 如果模板不完整，skill 会要求用户补充缺失文件，而不是自行猜测会议或期刊格式。
 
-## 依赖
+## 使用前依赖安装
 
-模板分析不一定需要完整 LaTeX 环境，但章节转换和编译验证建议安装：
+推荐的首次使用流程分成两步：
+
+1. 用户先根据下面的 Windows 或 Ubuntu 指令自行安装系统依赖。
+2. 用户告诉 Codex 已经安装完成。
+3. Codex 再运行自带环境检查脚本。
+4. 如果仍然缺少依赖，Codex 会报告具体缺什么，并且只有在获得明确许可后，才尝试联网、
+   写入用户环境、使用 `sudo` 或运行管理员安装器。
+
+不要期待 Codex 在一台全新的电脑上静默装完整套工作流。Zotero、MiKTeX、TeX Live
+这类 GUI 或系统级工具通常需要用户自己完成安装、刷新 PATH 或做首次启动配置。
+
+Markdown 转 LaTeX 必需：
 
 - `pandoc`
+
+PDF 编译至少选择一种路线：
+
 - `tectonic`
-- 可选：`latexmk`、`pdflatex`、`xelatex`、`bibtex`
-- 可选：Codex Zotero MCP，用于查询参考文献
+- 或 MiKTeX / TeX Live，包含 `pdflatex`、`xelatex`、`bibtex`，最好还有 `latexmk`
 
-如果任务需要大量引用、补全文献或查询论文，Zotero 实际上应该视为必需项。
-如果 Zotero 或 Zotero MCP 缺失，skill 应提醒用户安装/配置 Zotero，或者提供
-BibTeX、DOI、PDF、准确标题和作者信息，而不是编造引用。
+Zotero 优先引用工作流必需：
 
-## Windows 支持
+- Zotero 桌面端
+- Zotero 本地 API 已启用
+- `uv` / `uvx`
+- Codex 中已注册 Zotero MCP
 
-这个 skill 现在同时支持类 Unix shell 和 Windows 原生 PowerShell。
+如果任务需要引用、文献检索或补全 bibliography，而 Zotero 或 Zotero MCP 缺失，
+skill 应暂停并要求用户配置 Zotero，或提供 BibTeX、DOI、PDF、准确标题和作者信息，
+不能编造引用。
 
-Windows 用户推荐：
+### Windows PowerShell
 
-- **WSL2**：兼容性最好，使用 Bash 脚本（`*.sh`）。
-- **原生 PowerShell**：使用 PowerShell 脚本（`*.ps1`）。
-- **Git Bash**：可能可用，但 TeX 和 PATH 行为取决于本机安装。
-
-Windows 原生环境建议安装：
-
-- Pandoc
-- Tectonic、MiKTeX 或 TeX Live
-- 当需要参考文献查询时：Zotero 和 Zotero MCP
-
-在普通 PowerShell 中注册 Zotero MCP 的典型命令：
+Windows 原生用户建议在普通 PowerShell 里运行，而不是在受限 sandbox shell 里运行：
 
 ```powershell
-codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp
+winget install --id JohnMacFarlane.Pandoc -e
+winget install --id MiKTeX.MiKTeX -e
 ```
 
-同时需要打开 Zotero 并启用：
+如果你更想使用 Tectonic，并且已经有 conda：
+
+```powershell
+conda install -y -c conda-forge tectonic
+```
+
+从 Zotero 官方页面安装 Zotero：
+
+```text
+https://www.zotero.org/download/
+```
+
+也可以先搜索当前 winget 包名：
+
+```powershell
+winget search Zotero
+```
+
+安装 `uv`，这样 `uvx` 才能运行 `zotero-mcp`：
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+安装后重启 PowerShell、VS Code 和 Codex，让 PATH 更新生效。然后打开 Zotero，启用：
 
 ```text
 Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero
 ```
 
-如果 PowerShell 阻止脚本执行，可以用当前会话绕过策略运行：
+在普通 PowerShell 中注册 Zotero MCP：
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template
+codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp
 ```
 
-可以用自带脚本检查环境：
-
-```bash
-~/.codex/skills/latex-paper-writer/scripts/check_env.sh /path/to/template-or-project
-```
-
-Windows 原生 PowerShell：
+安装完成后，可以让 Codex 检查环境，或手动运行：
 
 ```powershell
 ~\.codex\skills\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template-or-project
 ```
 
-如果缺少 `pandoc` 或 `tectonic`，并且系统里有 conda，可以运行：
+如果 PowerShell 阻止脚本执行，可以只对当前命令绕过执行策略：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File ~\.codex\skills\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template-or-project
+```
+
+MiKTeX 可能需要首次启动配置或更新后，`pdflatex` 和 `bibtex` 才能正常工作。建议打开一次
+MiKTeX Console，检查更新，并允许编译时自动安装缺失包。
+
+### Ubuntu / WSL2
+
+安装常用命令行依赖：
+
+```bash
+sudo apt update
+sudo apt install -y pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended latexmk git unzip curl
+```
+
+如果你更想使用 Tectonic，并且已经有 conda：
+
+```bash
+conda install -y -c conda-forge tectonic
+```
+
+从 Zotero 官方页面安装 Zotero：
+
+```text
+https://www.zotero.org/download/
+```
+
+安装 `uv`，这样 `uvx` 才能运行 `zotero-mcp`：
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+安装 `uv` 后重启 shell，然后打开 Zotero 并启用：
+
+```text
+Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero
+```
+
+注册 Zotero MCP：
+
+```bash
+codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp
+```
+
+安装完成后，可以让 Codex 检查环境，或手动运行：
+
+```bash
+~/.codex/skills/latex-paper-writer/scripts/check_env.sh /path/to/template-or-project
+```
+
+如果仍然缺少 `pandoc` 或 `tectonic`，并且系统里有 conda，Codex 可以在获得许可后运行：
 
 ```bash
 ~/.codex/skills/latex-paper-writer/scripts/install_user_tools.sh
 ```
 
-Windows 原生 PowerShell：
+Windows 原生 PowerShell 的对应脚本是：
 
 ```powershell
 ~\.codex\skills\latex-paper-writer\scripts\install_user_tools.ps1
 ```
 
-这些脚本不会静默执行 `sudo` 或管理员安装器。
+这些脚本不会静默执行 `sudo`、下载 GUI 安装器或修改 PATH。
 
 ## 仓库结构
 
@@ -342,6 +505,7 @@ latex-paper-writer/
 │   └── openai.yaml
 ├── references/
 │   ├── citation-policy.md
+│   ├── dependency-setup.md
 │   ├── template-analysis.md
 │   └── writing-workflow.md
 └── scripts/
@@ -368,5 +532,4 @@ latex-paper-writer/
 
 ## License
 
-当前仓库还没有添加 `LICENSE` 文件。如果希望别人可以明确地复用、修改或分发，
-建议添加 MIT 或 Apache-2.0 License。
+本项目使用 MIT License，详见 `LICENSE`。

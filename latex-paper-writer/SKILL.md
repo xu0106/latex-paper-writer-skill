@@ -28,11 +28,11 @@ Then inspect:
 
 ## Workflow
 
-1. **Environment check**
-   - On Linux, macOS, Git Bash, or WSL2, run `scripts/check_env.sh <project-or-template-root>`.
-   - On native Windows PowerShell, run `scripts/check_env.ps1 -Root <project-or-template-root>`.
-   - If `pandoc` or TeX tooling is missing, use the matching `install_user_tools` script only after permission for network/user-environment writes is available.
-   - If the task needs citations or literature search and Zotero MCP is missing, stop before drafting and tell the user to install Zotero plus register the Zotero MCP. Do not silently fall back to invented or placeholder citations.
+1. **Dependency readiness**
+   - On a fresh or unverified machine, do not begin by auto-installing tools. First read `references/dependency-setup.md`, point the user to the OS-specific setup commands, and ask them to install the required tools manually.
+   - After the user says dependency installation is complete, run `scripts/check_env.sh <project-or-template-root>` on Linux, macOS, Git Bash, or WSL2, or `scripts/check_env.ps1 -Root <project-or-template-root>` on native Windows PowerShell.
+   - If `pandoc` or TeX tooling is still missing, report the missing tools and use the matching `install_user_tools` script only after explicit permission for network/user-environment writes, `sudo`, or elevated installers is available.
+   - If the task needs citations or literature search and Zotero desktop, Zotero local API, or Zotero MCP is missing, stop before drafting and tell the user to install/configure Zotero plus register the Zotero MCP. Do not silently fall back to invented or placeholder citations.
 
 2. **Template work copy**
    - Do not mutate the original template. Copy or unpack it into a work directory such as `paper_build_workdir/`.

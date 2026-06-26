@@ -28,13 +28,22 @@ check_optional_cmd() {
 }
 
 check_cmd pandoc
-check_cmd tectonic
 check_optional_cmd latexmk
+check_optional_cmd tectonic
 check_optional_cmd pdflatex
 check_optional_cmd xelatex
 check_optional_cmd bibtex
 check_optional_cmd unzip
 check_optional_cmd rsync
+
+if command -v tectonic >/dev/null 2>&1; then
+  printf "[ok] %-10s %s\n" "tex-route" "tectonic"
+elif command -v pdflatex >/dev/null 2>&1 || command -v xelatex >/dev/null 2>&1; then
+  printf "[ok] %-10s %s\n" "tex-route" "TeX distribution"
+else
+  printf "[missing] %-10s %s\n" "tex-route" "install tectonic or a TeX distribution"
+  status=1
+fi
 echo
 
 if command -v codex >/dev/null 2>&1; then
@@ -42,9 +51,24 @@ if command -v codex >/dev/null 2>&1; then
     echo "[ok] zotero MCP is configured"
   else
     echo "[warn] zotero MCP was not found in codex mcp list"
+    echo "       Citation lookup will be limited until Zotero MCP is registered."
+    echo "       Typical local-only setup:"
+    echo "       codex mcp add zotero --env ZOTERO_LOCAL=true -- uvx --upgrade zotero-mcp"
   fi
 else
   echo "[warn] codex CLI not found on PATH"
+  echo "       Cannot check or register Zotero MCP from this shell."
+fi
+
+if command -v curl >/dev/null 2>&1; then
+  if curl -fsS --max-time 2 http://127.0.0.1:23119/api >/dev/null 2>&1; then
+    echo "[ok] zotero local API responds"
+  else
+    echo "[warn] Zotero local API did not respond at http://127.0.0.1:23119/api"
+    echo "       Open Zotero and enable: Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero."
+  fi
+else
+  echo "[warn] curl not found; cannot check Zotero local API"
 fi
 echo
 
@@ -70,7 +94,8 @@ fi
 
 echo
 if [ "$status" -ne 0 ]; then
-  echo "Recommended user-level install when conda is available:"
+  echo "Recommended install routes:"
+  echo "  Ubuntu/WSL2: sudo apt install -y pandoc texlive-xetex texlive-latex-extra texlive-fonts-recommended latexmk"
   echo "  conda install -y -c conda-forge pandoc tectonic"
 fi
 

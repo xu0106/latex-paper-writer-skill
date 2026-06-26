@@ -27,13 +27,25 @@ function Test-Command {
 }
 
 Test-Command pandoc
-Test-Command tectonic
 Test-Command latexmk -Optional
+Test-Command tectonic -Optional
 Test-Command pdflatex -Optional
 Test-Command xelatex -Optional
 Test-Command bibtex -Optional
 Test-Command 7z -Optional
 Test-Command tar -Optional
+
+$hasTectonic = Get-Command tectonic -ErrorAction SilentlyContinue
+$hasPdfLaTeX = Get-Command pdflatex -ErrorAction SilentlyContinue
+$hasXeLaTeX = Get-Command xelatex -ErrorAction SilentlyContinue
+if ($hasTectonic) {
+    Write-Host ("[ok] {0,-10} {1}" -f "tex-route", "tectonic")
+} elseif ($hasPdfLaTeX -or $hasXeLaTeX) {
+    Write-Host ("[ok] {0,-10} {1}" -f "tex-route", "TeX distribution")
+} else {
+    Write-Host ("[missing] {0,-10} {1}" -f "tex-route", "install tectonic or a TeX distribution")
+    $status = 1
+}
 Write-Host ""
 
 if (Get-Command codex -ErrorAction SilentlyContinue) {
@@ -68,6 +80,18 @@ if (Get-Command zotero -ErrorAction SilentlyContinue) {
         Write-Host "       Install Zotero and enable its local API for Zotero-first citation workflows."
     }
 }
+
+try {
+    $response = Invoke-WebRequest -Uri "http://127.0.0.1:23119/api" -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
+    if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 500) {
+        Write-Host "[ok] zotero local API responds"
+    } else {
+        Write-Host "[warn] Zotero local API returned HTTP $($response.StatusCode)"
+    }
+} catch {
+    Write-Host "[warn] Zotero local API did not respond at http://127.0.0.1:23119/api"
+    Write-Host "       Open Zotero and enable: Settings -> Advanced -> Allow other applications on this computer to communicate with Zotero."
+}
 Write-Host ""
 
 if (Test-Path -LiteralPath $Root -PathType Container) {
@@ -97,9 +121,11 @@ if (Test-Path -LiteralPath $Root -PathType Container) {
 
 Write-Host ""
 if ($status -ne 0) {
-    Write-Host "Recommended user-level install when conda is available:"
+    Write-Host "Recommended install routes:"
+    Write-Host "  Windows: winget install --id JohnMacFarlane.Pandoc -e"
+    Write-Host "  Windows: winget install --id MiKTeX.MiKTeX -e"
     Write-Host "  conda install -y -c conda-forge pandoc tectonic"
-    Write-Host "For native Windows TeX, install MiKTeX or TeX Live and add it to PATH."
+    Write-Host "For Zotero-first citations, install Zotero and register Zotero MCP."
 }
 
 exit $status
