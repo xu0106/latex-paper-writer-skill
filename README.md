@@ -73,6 +73,12 @@ For best results, provide:
 If the template is incomplete, the skill should ask for the missing files rather
 than guessing the venue format.
 
+For real compile validation, a target LaTeX format is mandatory. If no
+conference/journal template is supplied, the skill should ask for the complete
+template directory or zip instead of creating a generic `article` PDF and calling
+it venue-formatted. A synthetic minimal template is only appropriate for an
+explicit script smoke test.
+
 ## Dependency Setup Before Using The Skill
 
 The recommended first-run workflow is intentionally two-phase:
@@ -262,6 +268,9 @@ The skill instructs Codex to:
 
 - Avoid editing the original template directly.
 - Work in a copied build directory.
+- Ask for the target LaTeX template/format before real compile validation.
+- Never use a generic `article` wrapper as a substitute for the requested venue
+  template.
 - Ask before network downloads, sudo, or user-environment writes.
 - Use Zotero or real BibTeX metadata instead of invented citation keys.
 - Ask for missing experimental results instead of making up numbers.
@@ -343,6 +352,10 @@ cp -a /tmp/latex-paper-writer-skill/latex-paper-writer ~/.codex/skills/
 - 需要引用的论文、PDF、DOI 列表、BibTeX 文件或 Zotero collection 名称。
 
 如果模板不完整，skill 会要求用户补充缺失文件，而不是自行猜测会议或期刊格式。
+
+如果要进行真实的编译验证，必须提供目标 LaTeX 格式/模板。没有会议或期刊模板时，
+skill 应要求用户上传完整模板目录或 zip，而不是创建一个通用 `article` PDF 并声称它符合
+目标格式。最小 synthetic 模板只能用于明确的脚本 smoke test。
 
 ## 使用前依赖安装
 
@@ -525,6 +538,8 @@ latex-paper-writer/
 
 - 不直接修改原始模板。
 - 在模板副本中写入和编译。
+- 在真实编译验证前，先要求用户提供目标 LaTeX 模板/格式。
+- 不能用通用 `article` wrapper 代替用户要求的会议/期刊模板。
 - 在需要联网下载、sudo 或写入用户环境时先询问用户。
 - 使用 Zotero 或真实 BibTeX 元数据，不编造 citation key。
 - 缺少实验结果时询问用户，不编造数字。

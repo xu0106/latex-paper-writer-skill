@@ -22,7 +22,9 @@ fi
 
 if [ -z "$MAIN" ] || [ ! -f "$MAIN" ]; then
   echo "[error] could not find a main .tex file with \\documentclass" >&2
-  echo "Ask the user for the complete template or pass MAIN_TEX explicitly." >&2
+  echo "Real compile validation requires the target LaTeX template/format." >&2
+  echo "Ask the user for the complete conference/journal template directory or zip, or pass MAIN_TEX explicitly." >&2
+  echo "Do not substitute a generic article template unless this is an explicit script smoke test." >&2
   exit 1
 fi
 

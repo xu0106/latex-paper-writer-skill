@@ -24,7 +24,7 @@ try {
     }
 
     if (-not $MainTex -or -not (Test-Path -LiteralPath $MainTex -PathType Leaf)) {
-        Write-Error "[error] could not find a main .tex file with \documentclass. Ask the user for the complete template or pass MainTex explicitly."
+        Write-Error "[error] could not find a main .tex file with \documentclass. Real compile validation requires the target LaTeX template/format. Ask the user for the complete conference/journal template directory or zip, or pass MainTex explicitly. Do not substitute a generic article template unless this is an explicit script smoke test."
         exit 1
     }
 

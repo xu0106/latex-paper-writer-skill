@@ -28,27 +28,32 @@ Then inspect:
 
 ## Workflow
 
-1. **Dependency readiness**
+1. **Template/format gate**
+   - Before any LaTeX conversion intended for a real paper, and before every compile validation, confirm the target LaTeX format: complete template directory or zip, main `.tex`, class/style files, bibliography style/config, and build instructions when available.
+   - If no target template/format is available, stop and ask the user to upload or point to the complete conference/journal template. Do not create a default `article`, `report`, or other generic wrapper as a substitute.
+   - A minimal synthetic template is allowed only for an explicit smoke test of the skill or scripts. Label it as a non-venue test and do not present the resulting PDF as formatted for the target venue.
+
+2. **Dependency readiness**
    - On a fresh or unverified machine, do not begin by auto-installing tools. First read `references/dependency-setup.md`, point the user to the OS-specific setup commands, and ask them to install the required tools manually.
    - After the user says dependency installation is complete, run `scripts/check_env.sh <project-or-template-root>` on Linux, macOS, Git Bash, or WSL2, or `scripts/check_env.ps1 -Root <project-or-template-root>` on native Windows PowerShell.
    - If `pandoc` or TeX tooling is still missing, report the missing tools and use the matching `install_user_tools` script only after explicit permission for network/user-environment writes, `sudo`, or elevated installers is available.
    - If the task needs citations or literature search and Zotero desktop, Zotero local API, or Zotero MCP is missing, stop before drafting and tell the user to install/configure Zotero plus register the Zotero MCP. Do not silently fall back to invented or placeholder citations.
 
-2. **Template work copy**
+3. **Template work copy**
    - Do not mutate the original template. Copy or unpack it into a work directory such as `paper_build_workdir/`.
    - If the template is incomplete, stop and request the missing files (`main.tex`, `.cls`, `.sty`, `.bst`, bibliography file, figures, etc.).
 
-3. **Draft**
+4. **Draft**
    - Write a Markdown draft first for review and traceability.
    - Use Pandoc citation syntax `[@key]`.
    - Use only claims supported by project files, user-provided notes, or cited literature.
 
-4. **Convert**
+5. **Convert**
    - Convert Markdown to a LaTeX fragment with `scripts/convert_md_to_tex.sh` or `scripts/convert_md_to_tex.ps1`.
    - Keep citations as LaTeX cite commands; do not render them into author-year prose.
    - Adapt headings, figures, tables, algorithms, and theorem environments to the template after conversion.
 
-5. **Integrate and compile**
+6. **Integrate and compile**
    - Insert or include the generated `.tex` in the template work copy using the template's existing section pattern.
    - Compile with `scripts/compile_template.sh` or `scripts/compile_template.ps1`.
    - Report the PDF path, unresolved citations/references, missing files, font issues, and next required user action.
@@ -58,6 +63,7 @@ Then inspect:
 Ask instead of guessing when:
 
 - The LaTeX template is not complete or the class/style files are missing.
+- The user asks to compile or validate a real paper but has not provided the target LaTeX template/format.
 - The venue requires a specific template but no template was uploaded.
 - Zotero, Zotero local API, or Zotero MCP is missing for a citation/literature task.
 - Zotero cannot find a requested paper or citation key.

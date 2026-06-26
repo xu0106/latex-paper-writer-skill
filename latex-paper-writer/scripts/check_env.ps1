@@ -32,6 +32,7 @@ Test-Command tectonic -Optional
 Test-Command pdflatex -Optional
 Test-Command xelatex -Optional
 Test-Command bibtex -Optional
+Test-Command uvx -Optional
 Test-Command 7z -Optional
 Test-Command tar -Optional
 
@@ -96,13 +97,19 @@ Write-Host ""
 
 if (Test-Path -LiteralPath $Root -PathType Container) {
     Write-Host "Likely LaTeX entrypoints:"
-    Get-ChildItem -LiteralPath $Root -Recurse -Depth 3 -Filter *.tex -ErrorAction SilentlyContinue |
+    $entrypoints = @(Get-ChildItem -LiteralPath $Root -Recurse -Depth 3 -Filter *.tex -ErrorAction SilentlyContinue |
         ForEach-Object {
             $content = Get-Content -LiteralPath $_.FullName -Raw -ErrorAction SilentlyContinue
             if ($content -match "\\documentclass") {
-                Write-Host ("  [main?] {0}" -f $_.FullName)
+                $_.FullName
             }
-        }
+        })
+    if ($entrypoints.Count -gt 0) {
+        $entrypoints | ForEach-Object { Write-Host ("  [main?] {0}" -f $_) }
+    } else {
+        Write-Host "  [warn] no main .tex with \documentclass found"
+        Write-Host "         Real compile validation requires the target LaTeX template/format."
+    }
 
     Write-Host ""
     Write-Host "Bibliography files:"

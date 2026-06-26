@@ -33,6 +33,7 @@ check_optional_cmd tectonic
 check_optional_cmd pdflatex
 check_optional_cmd xelatex
 check_optional_cmd bibtex
+check_optional_cmd uvx
 check_optional_cmd unzip
 check_optional_cmd rsync
 
@@ -74,11 +75,17 @@ echo
 
 if [ -d "$ROOT" ]; then
   echo "Likely LaTeX entrypoints:"
-  find "$ROOT" -maxdepth 3 -type f -name '*.tex' -print 2>/dev/null | while read -r f; do
+  entry_count=0
+  while IFS= read -r f; do
     if grep -q '\\documentclass' "$f" 2>/dev/null; then
       echo "  [main?] $f"
+      entry_count=$((entry_count + 1))
     fi
-  done
+  done < <(find "$ROOT" -maxdepth 3 -type f -name '*.tex' -print 2>/dev/null)
+  if [ "$entry_count" -eq 0 ]; then
+    echo "  [warn] no main .tex with \\documentclass found"
+    echo "         Real compile validation requires the target LaTeX template/format."
+  fi
 
   echo
   echo "Bibliography files:"

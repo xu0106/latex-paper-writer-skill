@@ -14,6 +14,10 @@ Prefer a complete directory or zip export. A complete template usually includes:
 - Example sections or sample body text.
 - Build instructions in `README`, `Makefile`, `.latexmkrc`, or Overleaf comments.
 
+Before compiling or claiming template conformance, confirm the target LaTeX format is present. If no target conference/journal template was supplied, ask the user to upload or point to the complete template directory or zip.
+
+Do not create a generic `article`/`report` wrapper to stand in for the target format. A minimal synthetic template is acceptable only for an explicit script smoke test; label that output as a non-venue test.
+
 If the user provides only one `.tex` file and it references unavailable class/style/bib files, stop and ask for the complete template zip.
 
 ## Entrypoint Detection
