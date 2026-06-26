@@ -83,10 +83,39 @@ and compile checks work best with:
 - optional: `latexmk`, `pdflatex`, `xelatex`, `bibtex`
 - optional: Codex Zotero MCP server for citation lookup
 
+## Windows Support
+
+The skill supports both Unix-like shells and native Windows PowerShell.
+
+Recommended Windows options:
+
+- **WSL2**: most compatible path; use the Bash scripts (`*.sh`).
+- **Native PowerShell**: use the PowerShell scripts (`*.ps1`).
+- **Git Bash**: may work with the Bash scripts, but TeX and PATH behavior depends
+  on the local installation.
+
+Native Windows users should install:
+
+- Pandoc
+- Tectonic, MiKTeX, or TeX Live
+- optional: Zotero and Zotero MCP for citation lookup
+
+If PowerShell blocks script execution, run the script for the current session with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template
+```
+
 The bundled environment checker reports what is available:
 
 ```bash
 ~/.codex/skills/latex-paper-writer/scripts/check_env.sh /path/to/template-or-project
+```
+
+On native Windows PowerShell:
+
+```powershell
+~\.codex\skills\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template-or-project
 ```
 
 If `pandoc` or `tectonic` is missing and `conda` is available, the helper script
@@ -96,7 +125,13 @@ can install user-level tools:
 ~/.codex/skills/latex-paper-writer/scripts/install_user_tools.sh
 ```
 
-It does not silently run `sudo`.
+On native Windows PowerShell:
+
+```powershell
+~\.codex\skills\latex-paper-writer\scripts\install_user_tools.ps1
+```
+
+These scripts do not silently run `sudo` or elevated installers.
 
 ## Repository Structure
 
@@ -111,9 +146,13 @@ latex-paper-writer/
 │   └── writing-workflow.md
 └── scripts/
     ├── check_env.sh
+    ├── check_env.ps1
     ├── compile_template.sh
+    ├── compile_template.ps1
     ├── convert_md_to_tex.sh
-    └── install_user_tools.sh
+    ├── convert_md_to_tex.ps1
+    ├── install_user_tools.sh
+    └── install_user_tools.ps1
 ```
 
 ## Safety Boundaries
@@ -214,10 +253,38 @@ cp -a /tmp/latex-paper-writer-skill/latex-paper-writer ~/.codex/skills/
 - 可选：`latexmk`、`pdflatex`、`xelatex`、`bibtex`
 - 可选：Codex Zotero MCP，用于查询参考文献
 
+## Windows 支持
+
+这个 skill 现在同时支持类 Unix shell 和 Windows 原生 PowerShell。
+
+Windows 用户推荐：
+
+- **WSL2**：兼容性最好，使用 Bash 脚本（`*.sh`）。
+- **原生 PowerShell**：使用 PowerShell 脚本（`*.ps1`）。
+- **Git Bash**：可能可用，但 TeX 和 PATH 行为取决于本机安装。
+
+Windows 原生环境建议安装：
+
+- Pandoc
+- Tectonic、MiKTeX 或 TeX Live
+- 可选：Zotero 和 Zotero MCP，用于文献查询
+
+如果 PowerShell 阻止脚本执行，可以用当前会话绕过策略运行：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template
+```
+
 可以用自带脚本检查环境：
 
 ```bash
 ~/.codex/skills/latex-paper-writer/scripts/check_env.sh /path/to/template-or-project
+```
+
+Windows 原生 PowerShell：
+
+```powershell
+~\.codex\skills\latex-paper-writer\scripts\check_env.ps1 -Root C:\path\to\template-or-project
 ```
 
 如果缺少 `pandoc` 或 `tectonic`，并且系统里有 conda，可以运行：
@@ -226,7 +293,13 @@ cp -a /tmp/latex-paper-writer-skill/latex-paper-writer ~/.codex/skills/
 ~/.codex/skills/latex-paper-writer/scripts/install_user_tools.sh
 ```
 
-这个脚本不会静默执行 `sudo`。
+Windows 原生 PowerShell：
+
+```powershell
+~\.codex\skills\latex-paper-writer\scripts\install_user_tools.ps1
+```
+
+这些脚本不会静默执行 `sudo` 或管理员安装器。
 
 ## 仓库结构
 
@@ -241,9 +314,13 @@ latex-paper-writer/
 │   └── writing-workflow.md
 └── scripts/
     ├── check_env.sh
+    ├── check_env.ps1
     ├── compile_template.sh
+    ├── compile_template.ps1
     ├── convert_md_to_tex.sh
-    └── install_user_tools.sh
+    ├── convert_md_to_tex.ps1
+    ├── install_user_tools.sh
+    └── install_user_tools.ps1
 ```
 
 ## 安全边界
