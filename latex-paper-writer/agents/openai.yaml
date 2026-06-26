@@ -1,0 +1,6 @@
+interface:
+  display_name: "LaTeX Paper Writer"
+  short_description: "Write sections from LaTeX templates"
+  default_prompt: "Use $latex-paper-writer to draft a paper section from my LaTeX template and local project files, then compile-check it."
+policy:
+  allow_implicit_invocation: true
